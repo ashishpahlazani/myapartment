@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Unit implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private int unitId;
+	private Long unitId;
 
-	private int apartmentId;
+	private Long apartmentId;
 
 	private Timestamp creationts;
 
@@ -31,7 +31,7 @@ public class Unit implements Serializable {
 
 	private String name;
 
-	private Integer parentUnitId;
+	private Long parentUnitId;
 
 	private UnitType unitType;
 	
@@ -43,8 +43,8 @@ public class Unit implements Serializable {
 	public Unit() {
 	}
 
-	public Unit(int unitId, int apartmentId, String description, 
-			int hierarchy, String name, Integer parentUnitId, UnitType unitType) {
+	public Unit(Long unitId, Long apartmentId, String description, 
+			int hierarchy, String name, Long parentUnitId, UnitType unitType) {
 		super();
 		this.unitId = unitId;
 		this.apartmentId = apartmentId;
@@ -55,19 +55,19 @@ public class Unit implements Serializable {
 		this.unitType = unitType;
 	}
 
-	public int getUnitId() {
+	public Long getUnitId() {
 		return this.unitId;
 	}
 
-	public void setUnitId(int unitId) {
+	public void setUnitId(Long unitId) {
 		this.unitId = unitId;
 	}
 
-	public int getApartmentId() {
+	public Long getApartmentId() {
 		return this.apartmentId;
 	}
 
-	public void setApartmentId(int apartmentId) {
+	public void setApartmentId(Long apartmentId) {
 		this.apartmentId = apartmentId;
 	}
 
@@ -111,11 +111,11 @@ public class Unit implements Serializable {
 		this.name = name;
 	}
 
-	public Integer getParentUnit() {
+	public Long getParentUnit() {
 		return this.parentUnitId;
 	}
 
-	public void setParentUnit(Integer parentUnitId) {
+	public void setParentUnit(Long parentUnitId) {
 		this.parentUnitId = parentUnitId;
 	}
 

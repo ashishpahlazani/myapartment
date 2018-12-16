@@ -1,5 +1,6 @@
 package org.ashish.acoolgames.myapartment.resource;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,70 +12,88 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.log4j.Logger;
 import org.ashish.acoolgames.myapartment.exception.DataNotFoundException;
 import org.ashish.acoolgames.myapartment.model.Unit;
 import org.ashish.acoolgames.myapartment.service.UnitService;
-
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UnitResource 
 {
-	UnitService unitService = new UnitService();
+	private static final Logger logger = Logger.getLogger(UnitResource.class);
 	
-	@DELETE
-    @Path("{unitId}")
-    public Unit deleteUnit(@PathParam("apartmentId") Integer apartmentId,
-    		@PathParam("unitId") Integer unitId) {
-    	System.out.println("removing unit " + unitId + " " + unitService.getUnit(unitId));
-        return unitService.removeUnit(unitId);
-    }
+	UnitService unitService = new UnitService();
     
     @POST
-    public Unit addUnit(Unit unit, @Context UriInfo uriInfo) {
-    	//Unit newMessage = unitService.addUnit(unit);
-    	//URI uri = uriInfo.getAbsolutePathBuilder().path(newMessage.getUnitId()).build();
-    	//return Response.created(uri).entity(newMessage).build();
-        return unitService.addUnit(unit);
+    public Response addUnit(@PathParam("apartmentId") Long apartmentId,
+    		Unit unit, @Context UriInfo uriInfo) 
+    {
+    	Unit newUnit = unitService.addUnit(unit);
+    	URI uri = uriInfo.getAbsolutePathBuilder().path(newUnit.getUnitId().toString()).build();
+    	return Response.created(uri).entity(newUnit).build();
     }
 	
 	@GET
-    public List<Unit> getAllUnits(@PathParam("apartmentId") Integer apartmentId) 
+    public Response getAllUnits(@PathParam("apartmentId") Long apartmentId) 
 	{
     	List<Unit> unitList = unitService.getAllUnitsOfApartment(apartmentId);
-    	if(unitList == null)
+    	if(unitList==null || unitList.size()==0)
     	{
-    		throw new DataNotFoundException("Apartment ID : " + apartmentId + " Not Found");
+    		Exception e = new RuntimeException("no unit found ");
+			throw new DataNotFoundException(e.getMessage(), e);
     	}
-        return unitList;
+    	final GenericEntity<List<Unit>> entity = new GenericEntity<List<Unit>>(unitList) {};
+    	return Response.ok().entity(entity).build();
     }
 	
 	@GET
 	@Path("/tree")
-    public Collection<Unit> getUnitTree(@PathParam("apartmentId") Integer apartmentId) 
+    public Response getUnitTree(@PathParam("apartmentId") Long apartmentId) 
 	{
     	Collection<Unit> unitTree = unitService.getUnitsTreeOfApartment(apartmentId);
-    	if(unitTree == null)
+    	if(unitTree==null || unitTree.size()==0)
     	{
-    		throw new DataNotFoundException("Apartment ID : " + apartmentId + " Not Found");
+    		Exception e = new RuntimeException("no unit found ");
+			throw new DataNotFoundException(e.getMessage(), e);
     	}
-        return unitTree;
+    	final GenericEntity<Collection<Unit>> entity = new GenericEntity<Collection<Unit>>(unitTree) {};
+    	return Response.ok().entity(entity).build();
     }
 	
 	@GET
     @Path("/{unitId}")
-    public Unit getUnit(@PathParam("apartmentId") Integer apartmentId,
-    		@PathParam("unitId") Integer unitId) 
+    public Response getUnit(@PathParam("apartmentId") Long apartmentId,
+    		@PathParam("unitId") Long unitId) 
 	{
     	Unit unit = unitService.getUnit(unitId);
-    	if(unit == null)
+    	if(unit==null)
     	{
-    		throw new DataNotFoundException("Unit ID : " + unitId + " Not Found");
+    		Exception e = new RuntimeException("unit not found for Id: " + unitId);
+			throw new DataNotFoundException(e.getMessage(), e);
     	}
-        return unit;
+    	return Response.ok().entity(unit).build();
+    }
+	
+	@DELETE
+    @Path("{unitId}")
+    public Response deleteUnit(@PathParam("apartmentId") Long apartmentId,
+    		@PathParam("unitId") Long unitId) 
+	{
+		logger.debug("removing unit " + unitId + " " + unitService.getUnit(unitId));
+		Unit deletedUnit = unitService.removeUnit(unitId);
+    	return Response.ok().entity(deletedUnit).build();
+    }
+	
+	@Path("{unitId}/profile")
+    public ProfileResource getProfileResource()
+    {
+    	return new ProfileResource();
     }
 }

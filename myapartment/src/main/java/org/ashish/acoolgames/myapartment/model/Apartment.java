@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Apartment implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private int apartmentId;
+	private Long apartmentId;
 
 	private String address;
 
@@ -22,13 +22,9 @@ public class Apartment implements Serializable {
 
 	private String adminName;
 
-	private Timestamp creationts;
-
 	private String description;
 
 	private String mapCoordinates;
-
-	private Timestamp modifiyts;
 
 	private String name;
 
@@ -36,10 +32,14 @@ public class Apartment implements Serializable {
 
 	private String ownerName;
 
+	private Timestamp creationts;
+
+	private Timestamp modifiyts;
+
 	public Apartment() {
 	}
 	
-	public Apartment(int apartmentId, String name, String description, 
+	public Apartment(Long apartmentId, String name, String description, 
 			String address, String ownerName, String ownerContact, 
 			String adminName, String adminContact, String mapCoordinates, 
 			Timestamp creationts, Timestamp modifiyts) {
@@ -48,22 +48,20 @@ public class Apartment implements Serializable {
 		this.address = address;
 		this.adminContact = adminContact;
 		this.adminName = adminName;
-		this.creationts = creationts;
 		this.description = description;
 		this.mapCoordinates = mapCoordinates;
-		this.modifiyts = modifiyts;
 		this.name = name;
 		this.ownerContact = ownerContact;
 		this.ownerName = ownerName;
+		this.creationts = creationts;
+		this.modifiyts = modifiyts;
 	}
 
-
-
-	public int getApartmentId() {
+	public Long getApartmentId() {
 		return this.apartmentId;
 	}
 
-	public void setApartmentId(int apartmentId) {
+	public void setApartmentId(Long apartmentId) {
 		this.apartmentId = apartmentId;
 	}
 

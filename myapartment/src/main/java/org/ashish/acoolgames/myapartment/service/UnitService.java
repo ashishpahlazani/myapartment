@@ -10,17 +10,17 @@ public class UnitService {
 	
 	private static UnitDao unitDao = new UnitDao();
 	
-	public List<Unit> getAllUnitsOfApartment(Integer apartmentId) 
+	public List<Unit> getAllUnitsOfApartment(Long apartmentId) 
 	{
 		return unitDao.getAllUnitsOfApartment(apartmentId);
 	}
 	
-	public Collection<Unit> getUnitsTreeOfApartment(Integer apartmentId) 
+	public Collection<Unit> getUnitsTreeOfApartment(Long apartmentId) 
 	{
 		return unitDao.getUnitsTreeOfApartment(apartmentId);
 	}
 	
-	public Unit getUnit(Integer unitId) 
+	public Unit getUnit(Long unitId) 
 	{
 		return unitDao.getUnitById(unitId);
 	}
@@ -30,7 +30,7 @@ public class UnitService {
 		return unitDao.insertUnit(unit);
 	}
 
-	public Unit removeUnit(Integer unitId) {
+	public Unit removeUnit(Long unitId) {
 		return unitDao.deleteUnit(unitId);
 	}
 	

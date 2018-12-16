@@ -1,7 +1,6 @@
 package org.ashish.acoolgames.myapartment.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Profile implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private String profileId;
+	private Long profileId;
 
 	private String address;
 
@@ -33,18 +32,37 @@ public class Profile implements Serializable {
 
 	private String nativeCity;
 
-	private BigInteger photoId;
+	private Long photoId;
 
 	private String skills;
 
 	public Profile() {
 	}
+	
+	public Profile(Long profileId, String name, String contact, String address, 
+			String nativeCity, String altContact, String description,Long photoId, 
+			String skills, Timestamp creationts, Timestamp modifiyts) {
+		super();
+		this.profileId = profileId;
+		this.address = address;
+		this.altContact = altContact;
+		this.contact = contact;
+		this.description = description;
+		this.name = name;
+		this.nativeCity = nativeCity;
+		this.photoId = photoId;
+		this.skills = skills;
+		this.creationts = creationts;
+		this.modifiyts = modifiyts;
+	}
 
-	public String getProfileId() {
+
+
+	public Long getProfileId() {
 		return this.profileId;
 	}
 
-	public void setProfileId(String profileId) {
+	public void setProfileId(Long profileId) {
 		this.profileId = profileId;
 	}
 
@@ -112,11 +130,11 @@ public class Profile implements Serializable {
 		this.nativeCity = nativeCity;
 	}
 
-	public BigInteger getPhotoId() {
+	public Long getPhotoId() {
 		return this.photoId;
 	}
 
-	public void setPhotoId(BigInteger photoId) {
+	public void setPhotoId(Long photoId) {
 		this.photoId = photoId;
 	}
 

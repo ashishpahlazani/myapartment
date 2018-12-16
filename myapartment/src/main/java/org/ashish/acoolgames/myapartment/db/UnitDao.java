@@ -14,25 +14,27 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.ashish.acoolgames.common.db.DBConnectionPool;
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+import org.ashish.acoolgames.myapartment.exception.DataNotFoundException;
 import org.ashish.acoolgames.myapartment.model.Unit;
 
-public class UnitDao extends AbstarctDao
+public class UnitDao extends AbstractDao
 {
-	private static final Logger logger = Logger.getLogger(ApartmentDao.class);
+	private static final Logger logger = Logger.getLogger(UnitDao.class);
 	
-	private static final String INSERT_UNIT_SQL = "INSERT INTO myapartment.unit ( UNIT_TYPE_ID, NAME, PARENT_UNIT_ID, "
+	private static final String INSERT_UNIT_SQL = "INSERT INTO UNIT ( UNIT_TYPE_ID, NAME, PARENT_UNIT_ID, "
 			+ "APARTMENT_ID, HIERARCHY, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)";
 	
-	private static final String DELETE_UNIT_BY_ID_SQL = "DELETE FROM myapartment.unit WHERE UNIT_ID=?";
+	private static final String DELETE_UNIT_BY_ID_SQL = "DELETE FROM UNIT WHERE UNIT_ID=?";
 	
 	private static final String GET_UNIT_BY_ID_SQL = "SELECT UNIT_ID, UNIT_TYPE_ID, NAME, PARENT_UNIT_ID, APARTMENT_ID, "
-			+ "HIERARCHY, DESCRIPTION FROM myapartment.unit WHERE UNIT_ID=?";
+			+ "HIERARCHY, DESCRIPTION, CREATIONTS, MODIFIYTS FROM UNIT WHERE UNIT_ID=?";
 	
 	private static final String GET_UNITS_BY_APARTMENT_ID_SQL = "SELECT UNIT_ID, UNIT_TYPE_ID, NAME, PARENT_UNIT_ID, "
-			+ "APARTMENT_ID, HIERARCHY, DESCRIPTION FROM myapartment.unit WHERE APARTMENT_ID=? "
+			+ "APARTMENT_ID, HIERARCHY, DESCRIPTION, CREATIONTS, MODIFIYTS FROM UNIT WHERE APARTMENT_ID=? "
 			+ "ORDER BY HIERARCHY";
 	
-	private static final String GET_CHILD_UNITS_SQL = "SELECT * FROM myapartment.unit WHERE PARENT_UNIT_ID=?";
+	private static final String GET_CHILD_UNITS_SQL = "SELECT * FROM UNIT WHERE PARENT_UNIT_ID=?";
 	
 	public Unit insertUnit(Unit unit)
 	{
@@ -47,15 +49,16 @@ public class UnitDao extends AbstarctDao
 			pstmtObj = connObj.prepareStatement(INSERT_UNIT_SQL);
 			pstmtObj.setInt(++colNo, unit.getUnitType().getUnitTypeId());
 			pstmtObj.setString(++colNo, unit.getName());
-			pstmtObj.setInt(++colNo, unit.getParentUnit());
-			pstmtObj.setInt(++colNo, unit.getApartmentId());
+			pstmtObj.setLong(++colNo, unit.getParentUnit());
+			pstmtObj.setLong(++colNo, unit.getApartmentId());
 			pstmtObj.setInt(++colNo, unit.getHierarchy());
 			pstmtObj.setString(++colNo, unit.getDescription());
 			logger.debug("Executing : " + pstmtObj.toString());
 			pstmtObj.execute();
 			unit.setUnitId(getLastInsertId(connObj));
-		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+		} catch(SQLException sqlException) {
+			logger.error("Exception inserting unit: " + sqlException);
+			throw new AddDataException("Exception inserting unit: ", sqlException);
 		} finally {
 			try {
 				// Closing PreparedStatement Object
@@ -66,14 +69,15 @@ public class UnitDao extends AbstarctDao
 				if(connObj != null) {
 					connObj.close();
 				}
-			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+			} catch(SQLException sqlException) {
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
+				throw new RuntimeException(sqlException);
 			}
 		}
 		return unit;
 	}
 	
-	public Unit getUnitById(Integer unitId)
+	public Unit getUnitById(Long unitId)
 	{
 		ResultSet rsObj = null;
 		Connection connObj = null;
@@ -85,7 +89,7 @@ public class UnitDao extends AbstarctDao
 
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_UNIT_BY_ID_SQL);
-			pstmtObj.setInt(++colNo, unitId);
+			pstmtObj.setLong(++colNo, unitId);
 			logger.debug("Executing: " + pstmtObj.toString());
 			rsObj = pstmtObj.executeQuery();
 			if (rsObj.next()) {
@@ -93,7 +97,8 @@ public class UnitDao extends AbstarctDao
 				logger.debug("UNIT : " + unit);
 			}
 		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+			logger.error("Exception getting unit: " + sqlException);
+			throw new DataNotFoundException("Exception getting unit: " + unitId , sqlException);
 		} finally {
 			try {
 				// Closing ResultSet Object
@@ -109,28 +114,34 @@ public class UnitDao extends AbstarctDao
 					connObj.close();
 				}
 			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
 			}
 		}
 		return unit;
 	}
 	
-	public Unit deleteUnit(Integer unitId)
+	public Unit deleteUnit(Long unitId)
 	{
 		Connection connObj = null;
 		PreparedStatement pstmtObj = null;
 		Unit unit = getUnitById(unitId);
+		if(unit==null)
+		{
+			Exception e = new RuntimeException("Could not delete, Unit not found for Id: " + unitId);
+			throw new DataNotFoundException(e.getMessage(), e);
+		}
 		try {	
 			DataSource dataSource = DBConnectionPool.getInstance().getDataSource();
 			connObj = dataSource.getConnection();
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(DELETE_UNIT_BY_ID_SQL);
-			pstmtObj.setInt(++colNo, unitId);
+			pstmtObj.setLong(++colNo, unitId);
 			logger.debug("Executing: " + pstmtObj.toString());
 			int rowCount = pstmtObj.executeUpdate();
 			logger.debug("Deleted : " + rowCount + " records");
 		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+			logger.error("Exception delting unit: " + sqlException);
+			throw new DataNotFoundException("Exception delting unit: " + unitId , sqlException);
 		} finally {
 			try {
 				// Closing PreparedStatement Object
@@ -142,13 +153,13 @@ public class UnitDao extends AbstarctDao
 					connObj.close();
 				}
 			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
 			}
 		}
 		return unit;
 	}
 	
-	public List<Unit> getAllUnitsOfApartment(Integer apartmentId)
+	public List<Unit> getAllUnitsOfApartment(Long apartmentId)
 	{
 		ResultSet rsObj = null;
 		Connection connObj = null;
@@ -161,7 +172,7 @@ public class UnitDao extends AbstarctDao
 
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_UNITS_BY_APARTMENT_ID_SQL);
-			pstmtObj.setInt(++colNo, apartmentId);
+			pstmtObj.setLong(++colNo, apartmentId);
 			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
 			while (rsObj.next()) {
@@ -170,7 +181,8 @@ public class UnitDao extends AbstarctDao
 				logger.debug("UNIT : " + unit);
 			}
 		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+			logger.error("Exception getting unit: " + sqlException);
+			throw new DataNotFoundException("Exception getting unit for apartmentId: " + apartmentId , sqlException);
 		} finally {
 			try {
 				// Closing ResultSet Object
@@ -186,18 +198,18 @@ public class UnitDao extends AbstarctDao
 					connObj.close();
 				}
 			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
 			}
 		}
 		return unitList;
 	}
 
-	public Collection<Unit> getUnitsTreeOfApartment(Integer apartmentId)
+	public Collection<Unit> getUnitsTreeOfApartment(Long apartmentId)
 	{
 		ResultSet rsObj = null;
 		Connection connObj = null;
 		PreparedStatement pstmtObj = null;
-		Map<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
+		Map<Long, Unit> unitMap = new HashMap<Long, Unit>();
 		Unit unit = null;
 		try {	
 			DataSource dataSource = DBConnectionPool.getInstance().getDataSource();
@@ -205,7 +217,7 @@ public class UnitDao extends AbstarctDao
 
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_UNITS_BY_APARTMENT_ID_SQL);
-			pstmtObj.setInt(++colNo, apartmentId);
+			pstmtObj.setLong(++colNo, apartmentId);
 			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
 			while (rsObj.next()) {
@@ -218,7 +230,8 @@ public class UnitDao extends AbstarctDao
 			}
 			logger.debug( unitMap );
 		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+			logger.error("Exception gettunig unit tree: " + sqlException);
+			throw new DataNotFoundException("Exception getting unit for apartmentId: " + apartmentId , sqlException);
 		} finally {
 			try {
 				// Closing ResultSet Object
@@ -234,7 +247,7 @@ public class UnitDao extends AbstarctDao
 					connObj.close();
 				}
 			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
 			}
 		}
 		
@@ -250,7 +263,7 @@ public class UnitDao extends AbstarctDao
 		return topUnitList;
 	}
 	
-	public List<Unit> getAllChildUnits(Integer parentUnitId)
+	public List<Unit> getAllChildUnits(Long parentUnitId)
 	{
 		ResultSet rsObj = null;
 		Connection connObj = null;
@@ -263,7 +276,7 @@ public class UnitDao extends AbstarctDao
 
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_CHILD_UNITS_SQL);
-			pstmtObj.setInt(++colNo, parentUnitId);
+			pstmtObj.setLong(++colNo, parentUnitId);
 			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
 			while (rsObj.next()) {
@@ -272,7 +285,8 @@ public class UnitDao extends AbstarctDao
 				logger.debug("UNIT : " + unit);
 			}
 		} catch(Exception sqlException) {
-			sqlException.printStackTrace();
+			logger.error("Exception geting unit: " + sqlException);
+			throw new DataNotFoundException("Exception getting child unit for unitId: " + parentUnitId , sqlException);
 		} finally {
 			try {
 				// Closing ResultSet Object
@@ -288,7 +302,7 @@ public class UnitDao extends AbstarctDao
 					connObj.close();
 				}
 			} catch(Exception sqlException) {
-				sqlException.printStackTrace();
+				logger.error(EXCEPTION_CLOSING_CONNECTION_LOG + sqlException);
 			}
 		}
 		return unitList;
@@ -296,12 +310,12 @@ public class UnitDao extends AbstarctDao
 
 	private Unit getUnitObjectFromRs(ResultSet rsObj) throws SQLException {
 		return new Unit(
-				rsObj.getInt("UNIT_ID"), 
-				rsObj.getInt("APARTMENT_ID"), 
+				rsObj.getLong("UNIT_ID"), 
+				rsObj.getLong("APARTMENT_ID"), 
 				rsObj.getString("DESCRIPTION"), 
 				rsObj.getInt("HIERARCHY"), 
 				rsObj.getString("NAME"), 
-				rsObj.getInt("PARENT_UNIT_ID"),
+				rsObj.getLong("PARENT_UNIT_ID"),
 				new UnitTypeDao().getUnitType(rsObj.getInt("UNIT_TYPE_ID")));
 	}
 
