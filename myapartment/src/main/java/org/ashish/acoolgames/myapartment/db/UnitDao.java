@@ -173,8 +173,8 @@ public class UnitDao extends AbstractDao
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_UNITS_BY_APARTMENT_ID_SQL);
 			pstmtObj.setLong(++colNo, apartmentId);
-			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
+			rsObj = pstmtObj.executeQuery();
 			while (rsObj.next()) {
 				unit = getUnitObjectFromRs(rsObj);
 				unitList.add(unit);
@@ -218,8 +218,8 @@ public class UnitDao extends AbstractDao
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_UNITS_BY_APARTMENT_ID_SQL);
 			pstmtObj.setLong(++colNo, apartmentId);
-			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
+			rsObj = pstmtObj.executeQuery();
 			while (rsObj.next()) {
 				unit = getUnitObjectFromRs(rsObj);
 				if( unit.getParentUnit() != null && unit.getParentUnit() != 0 )
@@ -277,8 +277,8 @@ public class UnitDao extends AbstractDao
 			int colNo = 0;
 			pstmtObj = connObj.prepareStatement(GET_CHILD_UNITS_SQL);
 			pstmtObj.setLong(++colNo, parentUnitId);
-			rsObj = pstmtObj.executeQuery();
 			logger.debug("Executing: " + pstmtObj.toString());
+			rsObj = pstmtObj.executeQuery();
 			while (rsObj.next()) {
 				unit = getUnitObjectFromRs(rsObj);
 				unitList.add(unit);

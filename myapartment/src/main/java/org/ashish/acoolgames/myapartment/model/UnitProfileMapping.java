@@ -2,28 +2,41 @@ package org.ashish.acoolgames.myapartment.model;
 
 import java.sql.Timestamp;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.ashish.acoolgames.myapartment.types.VisitorMappingType;
 
+@XmlRootElement
 public class UnitProfileMapping {
+	private Long mappingId;
 	private Long unitId;
 	private Long profileId;
 	private VisitorMappingType mappingType;
 	private String description;
 	private Timestamp creationts;
 	private Timestamp modifiyts;
+	//selective population
+	private Profile profile;
 	
 	public UnitProfileMapping() {
 		super();
 	}
-	public UnitProfileMapping(Long unitId, Long profileId, VisitorMappingType mappingType, 
+	public UnitProfileMapping(Long mappingId, Long unitId, Long profileId, VisitorMappingType mappingType, 
 			String description, Timestamp creationts, Timestamp modifiyts) {
 		super();
+		this.mappingId = mappingId;
 		this.unitId = unitId;
 		this.profileId = profileId;
 		this.mappingType = mappingType;
 		this.description = description;
 		this.creationts = creationts;
 		this.modifiyts = modifiyts;
+	}
+	public Long getMappingId() {
+		return mappingId;
+	}
+	public void setMappingId(Long mappingId) {
+		this.mappingId = mappingId;
 	}
 	public Long getUnitId() {
 		return unitId;
@@ -54,6 +67,12 @@ public class UnitProfileMapping {
 	}
 	public Timestamp getModifiyts() {
 		return modifiyts;
+	}
+	public Profile getProfile() {
+		return profile;
+	}
+	public void setProfile(Profile profile) {
+		this.profile = profile;
 	}
 	@Override
 	public String toString() {

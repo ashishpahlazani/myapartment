@@ -91,9 +91,9 @@ public class UnitResource
     	return Response.ok().entity(deletedUnit).build();
     }
 	
-	@Path("{unitId}/profile")
-    public ProfileResource getProfileResource()
+	@Path("{unitId}/profilemapping")
+    public UnitProfileMappingResource getProfileResource()
     {
-    	return new ProfileResource();
+    	return new UnitProfileMappingResource();
     }
 }

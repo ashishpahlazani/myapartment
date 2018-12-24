@@ -190,7 +190,7 @@ public class ProfileDao extends AbstractDao {
 		return profileList;
 	}
 	
-	private Profile getProfileObjectFromRs(ResultSet rsObj) throws SQLException {
+	public static Profile getProfileObjectFromRs(ResultSet rsObj) throws SQLException {
 		return new Profile(
 				rsObj.getLong("PROFILE_ID"), 
 				rsObj.getString("NAME"), 
