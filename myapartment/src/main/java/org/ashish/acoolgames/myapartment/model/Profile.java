@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+
 
 /**
  * The persistent class for the profile database table.
@@ -145,5 +147,22 @@ public class Profile implements Serializable {
 	public void setSkills(String skills) {
 		this.skills = skills;
 	}
-
+	
+	public void validate(Profile profile) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(profile.getName()==null)
+		{
+			errorMessage.append("Profile name cannot be null!\n");
+		}
+		if(profile.getContact()==null)
+		{
+			errorMessage.append("Profile contact cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
+	}
 }

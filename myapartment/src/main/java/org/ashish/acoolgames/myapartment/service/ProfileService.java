@@ -20,6 +20,7 @@ public class ProfileService {
 
 	public Profile addProfile(Profile profile) 
 	{
+		profile.validate(profile);
 		return profileDao.addProfile(profile);
 	}
 

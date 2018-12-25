@@ -17,6 +17,7 @@ public class ApartmentService {
 	}
 
 	public Apartment addApartment(Apartment apartment) {
+		apartment.validate(apartment);
 		return apartmentDao.insertApartment(apartment);
 	}
 

@@ -27,6 +27,7 @@ public class UnitService {
 
 	public Unit addUnit(Unit unit) 
 	{
+		unit.validate(unit);
 		return unitDao.insertUnit(unit);
 	}
 

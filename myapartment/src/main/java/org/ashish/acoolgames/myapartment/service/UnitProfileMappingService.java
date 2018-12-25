@@ -10,6 +10,7 @@ public class UnitProfileMappingService {
 	private static UnitProfileMappingDao unitProfileMappingDao = new UnitProfileMappingDao();
 	
 	public UnitProfileMapping addUnitProfileMapping(UnitProfileMapping mapping) {
+		mapping.validate(mapping);
 		return unitProfileMappingDao.insertMapping(mapping);
 	}
 	

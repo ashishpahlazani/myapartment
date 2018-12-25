@@ -6,6 +6,8 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+
 
 /**
  * The persistent class for the entry_log database table.
@@ -31,7 +33,7 @@ public class EntryLog implements Serializable {
 
 	private String reason;
 
-	private int unitId;
+	private Integer unitId;
 
 	public EntryLog() {
 	}
@@ -100,12 +102,33 @@ public class EntryLog implements Serializable {
 		this.reason = reason;
 	}
 
-	public int getUnitId() {
+	public Integer getUnitId() {
 		return this.unitId;
 	}
 
-	public void setUnitId(int unitId) {
+	public void setUnitId(Integer unitId) {
 		this.unitId = unitId;
 	}
-
+	
+	public static void validate(EntryLog entryLog) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(entryLog.getProfileId()==null)
+		{
+			errorMessage.append("Profile id cannot be null!\n");
+		}
+		if(entryLog.getUnitId()==null)
+		{
+			errorMessage.append("Unit Id cannot be null!\n");
+		}
+		if(entryLog.getReason()==null)
+		{
+			errorMessage.append("Reason cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
+	}
 }

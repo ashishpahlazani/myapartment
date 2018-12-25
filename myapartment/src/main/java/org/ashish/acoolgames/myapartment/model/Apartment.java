@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+
 
 /**
  * The persistent class for the apartment database table.
@@ -143,6 +145,32 @@ public class Apartment implements Serializable {
 
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	public void validate(Apartment apartment) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(apartment.getName()==null)
+		{
+			errorMessage.append("Apartment name cannot be null!\n");
+		}
+		if(apartment.getAddress()==null)
+		{
+			errorMessage.append("Address cannot be null!\n");
+		}
+		if(apartment.getAdminName()==null)
+		{
+			errorMessage.append("Admin name cannot be null!\n");
+		}
+		if(apartment.getAdminContact()==null)
+		{
+			errorMessage.append("Admin contact cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
 	}
 
 }

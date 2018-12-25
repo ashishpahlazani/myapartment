@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+
 /**
  * The persistent class for the unit_type database table.
  * 
@@ -71,5 +73,17 @@ public class UnitType implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	public static void validate(UnitType unitType) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(unitType.getName()==null)
+		{
+			errorMessage.append("Type name cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
+	}
 }

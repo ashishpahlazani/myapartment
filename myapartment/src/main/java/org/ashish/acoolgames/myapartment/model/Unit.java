@@ -8,6 +8,8 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
+
 
 /**
  * The persistent class for the unit database table.
@@ -143,5 +145,27 @@ public class Unit implements Serializable {
 			childUnits = new ArrayList<Unit>();
 		}
 		childUnits.add(unit);
+	}
+	
+	public void validate(Unit unit) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(unit.getName()==null)
+		{
+			errorMessage.append("Unit name cannot be null!\n");
+		}
+		if(unit.getApartmentId()==null)
+		{
+			errorMessage.append("Apartment Id cannot be null!\n");
+		}
+		if(unit.getUnitType()==null)
+		{
+			errorMessage.append("Unit type cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
 	}
 }

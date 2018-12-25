@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ashish.acoolgames.myapartment.exception.AddDataException;
 import org.ashish.acoolgames.myapartment.types.VisitorMappingType;
 
 @XmlRootElement
@@ -79,5 +80,25 @@ public class UnitProfileMapping {
 		return "UnitProfileMapping [unitId=" + unitId + ", profileId="
 				+ profileId + ", mappingType=" + mappingType + "]";
 	}
-	
+	public void validate(UnitProfileMapping mapping) {
+		StringBuilder errorMessage = new StringBuilder();
+		
+		if(mapping.getMappingType()==null)
+		{
+			errorMessage.append("Mapping type cannot be null!\n");
+		}
+		if(mapping.getProfileId()==null)
+		{
+			errorMessage.append("Profile Id cannot be null!\n");
+		}
+		if(mapping.getUnitId()==null)
+		{
+			errorMessage.append("Unit id cannot be null!\n");
+		}
+		
+		if(errorMessage.length()!=0)
+		{
+			throw new AddDataException(errorMessage.toString(), new RuntimeException(""));
+		}
+	}
 }
